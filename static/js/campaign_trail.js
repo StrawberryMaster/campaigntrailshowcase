@@ -138,12 +138,23 @@ window.setInterval(function () {
     }
 }, 200);
 
-var fileExists = function (url) {
+var fileExists = function (url, callback) {
     var req = new XMLHttpRequest();
-    req.open("GET", url, false);
+    
+    req.open("GET", url, true);
     console.log("trying to get file from url " + url);
+
+    req.onreadystatechange = function() {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                if (callback) {
+                    callback(req.responseText);
+                }
+            }
+        }
+    };
+
     req.send();
-    return req.status === 200;
 };
 
 lastUpdatedDate = "2023-08-20";
@@ -1959,14 +1970,10 @@ function divideElectoralVotesProp(e, t) {
                             endingUrl = "../static/mods/" + theorId + "_ending.html";
 
                             try {
-                                if (fileExists(endingUrl)) {
-                                    var client2 = new XMLHttpRequest();
-                                    client2.open("GET", endingUrl);
-                                    client2.onreadystatechange = function () {
-                                        important_info = client2.responseText;
-                                    };
-                                    client2.send();
-                                }
+                                fileExists(endingUrl, function (fileContent) {
+                                    console.log("ending file found, loading content");
+                                    important_info = fileContent;
+                                });
                             } catch(err) {
                                 console.error("Error loading code 2", err);
                             }
