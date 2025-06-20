@@ -589,10 +589,7 @@ function onChangeModSorter(e) {
 function sortModViews(comparisonFunction) {
   modList.sort(comparisonFunction);
   const modGrid = document.getElementById("mod-grid");
-  modGrid.innerHTML = "";
-  for (let i = 0; i < modList.length; i++) {
-    modGrid.appendChild(modList[i]);
-  }
+  modGrid.append(...modList);
 }
 
 function isFavorite(modName) {
