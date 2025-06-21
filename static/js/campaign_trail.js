@@ -138,6 +138,8 @@ window.setInterval(function () {
     }
 }, 200);
 
+// Function before refactoring (for context)
+/*
 var fileExists = function (url, callback) {
     var req = new XMLHttpRequest();
     
@@ -156,6 +158,22 @@ var fileExists = function (url, callback) {
 
     req.send();
 };
+*/
+
+async function fileExists(url, callback) {
+    console.log("trying to get file from url " + url);
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const fileContent = await response.text();
+            if (callback) {
+                callback(fileContent);
+            }
+        }
+    } catch (error) {
+        console.error(`error fetching file from ${url}:`, error);
+    }
+}
 
 lastUpdatedDate = "2023-08-20";
 var RecReading;
