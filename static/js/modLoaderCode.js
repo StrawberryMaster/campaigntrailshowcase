@@ -601,6 +601,7 @@ function createLegacyViewControls() {
   return container;
 }
 
+let allModsData = [];
 
 $(document).ready(async () => {
   // show loading indicator while mods load
@@ -609,73 +610,67 @@ $(document).ready(async () => {
 
   const modNameParam = getUrlParam("modName");
 
-  favoriteMods = new Set(
-    localStorage.getItem("favoriteMods")?.split(",") || [],
-  );
+  favoriteMods = new Set(localStorage.getItem("favoriteMods")?.split(",") || []);
   customMods = new Set(localStorage.getItem("customMods")?.split(",") || []);
 
-  const $modSelect = $("#modSelect");
-  const originalOptions = $modSelect.find("option").clone();
+  try {
+    const response = await fetch("../static/mods/mods.json");
+    allModsData = await response.json();
+  } catch (e) {
+    console.error("Could not load mods.json", e);
+    gridEl.innerHTML = "Error loading mod list.";
+    return;
+  }
 
-  // Inject the "View all mods" checkbox next to the sorter using a more robust selector
+  // Inject the "View all mods" checkbox
   const sorter = document.querySelector('[onchange="onChangeModSorter(event)"]');
   if (sorter && sorter.parentNode) {
     const legacyControls = createLegacyViewControls();
-    // insert after the sorter element
     sorter.parentNode.insertBefore(legacyControls, sorter.nextSibling);
-  } else {
-    console.warn("Could not find mod sorter dropdown to attach 'View all' checkbox.");
   }
 
-  $(".tagCheckbox").on("change", filterEntries);
-
-  await loadEntries();
-  const mods = document.getElementById("modSelect").childNodes;
-
-  let tagsFound = new Set();
-
-  // Get tags from normal mods and add optional custom tag
-  mods.forEach((mod) => {
-    if (!mod.dataset || !mod.dataset.tags) return;
-    const tags = mod.dataset.tags.split(" ");
-    tags.forEach((tag) => {
-      if (tag.length > 0) {
-        tagsFound.add(tag);
-      }
-    });
-
-    if (customMods.size > 0) {
-      tagsFound.add("Custom");
-    }
+  // Setup tags
+  $(".tagCheckbox").on("change", () => { 
+      currentPage = 1; 
+      updateModViews(); 
   });
 
-  let allModsLength = mods.length - 1;
+  let tagsFound = new Set();
+  
+  // Collect tags from JSON
+  allModsData.forEach(mod => {
+    if(mod.tags) {
+      mod.tags.forEach(tag => {
+        if(tag.length > 0) tagsFound.add(tag);
+      });
+    }
+  });
+  if (customMods.size > 0) tagsFound.add("Custom");
+
   let modsLoaded = [];
 
-  // Set up from normal mods
-  const modPromises = Array.from(mods).map(async (mod) => {
-    // MODIFIED: logic to load both mods when needed
+  const modPromises = allModsData.map(async (mod) => {
+    
     if (
-      mod.value === "other" ||
-      ( // Special case for DSA because it uses two code 1s to define achievements. So we need to load both of those to get both sets.
+      mod.id === "other" ||
+      ( 
         getUrlParam("modName") != null &&
-        getUrlParam("modName") != mod.value &&
-        !(getUrlParam("modName") === "2024" && mod.value === "2024 Divided States")
+        getUrlParam("modName") != mod.id &&
+        !(getUrlParam("modName") === "2024" && mod.id === "2024 Divided States")
       )
     ) {
-      allModsLength--;
       return;
     }
 
-    namesOfModsFromValue[mod.value] = mod.innerText ?? mod.value;
+    namesOfModsFromValue[mod.id] = mod.name;
 
     try {
-      const modRes = await fetch(`../static/mods/${mod.value}_init.html`);
+      const modRes = await fetch(`../static/mods/${mod.id}_init.html`);
       const rawModText = await modRes.text();
 
-      const temp = extractElectionDetails(rawModText, mod.value);
-      getAllAchievements(rawModText, mod.value);
-      getCustomTheme(rawModText, mod.value);
+      const temp = extractElectionDetails(rawModText, mod.id);
+      getAllAchievements(rawModText, mod.id);
+      getCustomTheme(rawModText, mod.id);
 
       let imageUrl = "";
       let description = "";
@@ -686,19 +681,16 @@ $(document).ready(async () => {
         description = temp.election_json[0].fields.site_description ?? temp.election_json[0].fields.summary;
       } else {
         loaded = false;
-        console.log(`Missing or cannot read Code 1 for mod: ${mod.value}`);
-        description = `<h1 style="color:red">COULD NOT GET CODE 1 PLEASE ALERT DEV!</h1>`;
+        console.log(`Missing Code 1 for mod: ${mod.id}`);
+        description = `<h1 style="color:red">COULD NOT GET CODE 1</h1>`;
       }
 
-      if (!loaded) {
-        allModsLength--;
-        return;
-      }
+      if (!loaded) return;
 
-      modsLoaded.push({ mod: mod, imageUrl: imageUrl, description: description });
+      modsLoaded.push({ modData: mod, imageUrl: imageUrl, description: description });
+
     } catch (error) {
-      console.error(`Error loading mod ${mod.value}:`, error);
-      allModsLength--;
+      console.error(`Error loading mod ${mod.id}:`, error);
     }
   });
 
@@ -706,24 +698,14 @@ $(document).ready(async () => {
 
   // if we are not loading a specific mod, preload all award icons
   if (!modNameParam) {
-    // collect all award icon URLs for preloading
     const allAwardIconUrls = new Set();
-    Array.from(mods).forEach(mod => {
-      if (mod.dataset && mod.dataset.awardimageurls) {
-        mod.dataset.awardimageurls.split(", ").forEach(url => {
-          allAwardIconUrls.add(url);
-        });
+    allModsData.forEach(mod => {
+      if (mod.awardImages && mod.awardImages.length > 0) {
+        mod.awardImages.forEach(url => allAwardIconUrls.add(url));
       }
     });
-
-    // preload all award icons
     if (allAwardIconUrls.size > 0) {
-      console.log(`Preloading ${allAwardIconUrls.size} award icons...`);
-      Promise.allSettled([...allAwardIconUrls].map(preloadAwardIcon))
-        .then(results => {
-          const loaded = results.filter(r => r.status === 'fulfilled').length;
-          console.log(`Preloaded ${loaded}/${allAwardIconUrls.size} award icons`);
-        });
+       Promise.allSettled([...allAwardIconUrls].map(preloadAwardIcon));
     }
   }
 
@@ -731,77 +713,53 @@ $(document).ready(async () => {
   let customModsLoaded = [];
   for (const customModName of customMods) {
     const rawModText = localStorage.getItem(customModName + "_code1");
-
     const temp = extractElectionDetails(rawModText, customModName);
-
-    if (
-      !temp?.election_json?.[0]?.fields
-    ) {
-      continue;
-    }
+    if (!temp?.election_json?.[0]?.fields) continue;
 
     getAllAchievements(rawModText, customModName);
     getCustomTheme(rawModText, customModName);
 
-    const imageUrl =
-      temp.election_json[0].fields.site_image ??
-      temp.election_json[0].fields.image_url;
-    const description =
-      temp.election_json[0].fields.site_description ??
-      temp.election_json[0].fields.summary;
+    const imageUrl = temp.election_json[0].fields.site_image ?? temp.election_json[0].fields.image_url;
+    const description = temp.election_json[0].fields.site_description ?? temp.election_json[0].fields.summary;
 
-    const modView = createModView(
-      {
-        value: customModName,
-        innerText: customModName,
-        dataset: { tags: "Custom" },
-      },
-      imageUrl,
-      description,
-    );
+    // mock a JSON object for custom mods
+    const customModObj = {
+        id: customModName,
+        name: customModName,
+        tags: ["Custom"],
+        mode: "",
+        awards: [],
+        awardImages: []
+    };
+
+    const modView = createModView(customModObj, imageUrl, description);
     customModsLoaded.push(modView);
     modList.push(modView);
   }
 
-  // push custom mods to the mod grid first
   const modGrid = document.getElementById("mod-grid");
   const fragment = document.createDocumentFragment();
-  customModsLoaded.forEach(modView => {
-    fragment.appendChild(modView);
-  });
+  
+  customModsLoaded.forEach(modView => fragment.appendChild(modView));
 
-  modsLoaded.sort(modCompare);
+  modsLoaded.sort((a, b) => a.modData.id.localeCompare(b.modData.id));
+  
   for (let i = 0; i < modsLoaded.length; i++) {
-    const modData = modsLoaded[i];
+    const data = modsLoaded[i];
+    if (data.modData.id === '2024 Divided States') continue;
 
-    // this is a special case for DSA, so we skip this in particular
-    if (modData.mod.value === '2024 Divided States') continue;
-
-    const modView = createModView(
-      modData.mod,
-      modData.imageUrl,
-      modData.description,
-    );
+    const modView = createModView(data.modData, data.imageUrl, data.description);
     fragment.appendChild(modView);
 
-    if (
-      modData.mod.dataset.awardimageurls &&
-      modData.mod.dataset.awardimageurls.split(", ").length > 1
-    ) {
-      // find the holder and start the cycling process
-      cycleAwards(
-        modView.querySelector(".trophy-holder"),
-        0,
-      );
+    if (data.modData.awardImages && data.modData.awardImages.length > 1) {
+      cycleAwards(modView.querySelector(".trophy-holder"), 0);
     }
-
     modList.push(modView);
   }
+  
   modGrid.appendChild(fragment);
-
   createTagButtons(tagsFound);
   updateModViews();
-
   applyModBoxThemes();
 
   if (modNameParam) {
@@ -810,47 +768,58 @@ $(document).ready(async () => {
   }
 });
 
-function createModView(mod, imageUrl, description, isCustom) {
+function createModView(modData, imageUrl, description) {
   const modView = document.createElement("div");
   modView.classList.add("community-grid-element");
 
-  modView.setAttribute("mode", mod.dataset.mode);
-  modView.setAttribute("tags", mod.dataset.tags);
-  modView.setAttribute("awardimageurls", mod.dataset.awardimageurls);
-  modView.setAttribute("awards", mod.dataset.awards);
-  modView.setAttribute("mod-name", mod.value);
-  modView.setAttribute("mod-display-name", mod.innerText.toLowerCase());
-  namesOfModsFromValue[mod.value] = mod.innerText;
+  const tagsString = modData.tags ? modData.tags.join(" ") : "";
+  const awardUrlsString = modData.awardImages ? modData.awardImages.join(", ") : "";
+  const awardsString = modData.awards ? modData.awards.join(",") : "";
 
-  modView._tagsArray = mod.dataset.tags ? mod.dataset.tags.split(" ") : [];
+  modView.setAttribute("mode", modData.mode || "");
+  modView.setAttribute("tags", tagsString);
+  modView.setAttribute("awardimageurls", awardUrlsString);
+  modView.setAttribute("awards", awardsString);
+  modView.setAttribute("mod-name", modData.id);
+  modView.setAttribute("mod-display-name", modData.name.toLowerCase());
+  
+  namesOfModsFromValue[modData.id] = modData.name;
 
-  const favText = isFavorite(mod.value) ? UNFAV : FAV;
+  modView._tagsArray = modData.tags || [];
+
+  const favText = isFavorite(modData.id) ? UNFAV : FAV;
+
+  const isCustom = customMods.has(modData.id);
+  let awardsHTML = "";
+  if (modData.awards && modData.awards.length > 0) {
+      awardsHTML = renderAwards(awardsString, awardUrlsString);
+  }
 
   modView.innerHTML = `
     <div class="mod-title">
-        <p>${mod.innerText}</p>
+        <p>${modData.name}</p>
     </div>
     <div class = "mod-img-desc">
-      <img class="mod-image" data-src="${imageUrl}" loading="lazy" alt="${mod.value} Box Image"></img>
+      <img class="mod-image" data-src="${imageUrl}" loading="lazy" alt="${modData.id} Box Image"></img>
       <div class="mod-desc">${description}</div>
     </div>
     <div class="hover-button-holder">
-        <button class="mod-play-button hover-button" onclick="loadModFromButton(\`${mod.value}\`)"><span>${PLAY}</span></button>
-        <button class="hover-button" onclick="toggleFavorite(event, \`${mod.value}\`)"><span>${favText}</span></button>
-        <button style="${customMods.has(mod.value) ? "" : "display:none;"}" class="hover-button" onclick="deleteCustomMod(event, \`${mod.value}\`)"><span>${DELETE}</span></button>
+        <button class="mod-play-button hover-button" onclick="loadModFromButton(\`${modData.id}\`)"><span>${PLAY}</span></button>
+        <button class="hover-button" onclick="toggleFavorite(event, \`${modData.id}\`)"><span>${favText}</span></button>
+        <button style="${isCustom ? "" : "display:none;"}" class="hover-button" onclick="deleteCustomMod(event, \`${modData.id}\`)"><span>${DELETE}</span></button>
     </div>
-    ${!customMods.has(mod.value)
+    ${!isCustom
       ? `
     <div class="rating-background">
         <div class="modRating">LOADING FAVORITES...</div>
         <div class="modPlayCount">LOADING PLAYS...</div>
-        ${mod.dataset.awards != null && mod.dataset.awards.length > 0 ? renderAwards(mod.dataset.awards, mod.dataset.awardimageurls) : ""}
+        ${awardsHTML}
     </div>`
       : ""
     }
   `;
 
-  modView.id = mod.value;
+  modView.id = modData.id;
   return modView;
 }
 
