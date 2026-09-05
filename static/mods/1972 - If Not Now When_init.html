@@ -10,7 +10,7 @@ e.done = true;
             document.getElementsByClassName("game_header")[0].style.backgroundColor = nct_stuff.themes[nct_stuff.selectedTheme].coloring_title;
 
             $("#game_window")[0].style.backgroundColor = nct_stuff.themes[nct_stuff.selectedTheme].coloring_window;
-
+ 
            $(".container")[0].style.backgroundColor = "#7f9a77";
 
             document.getElementById("header").src = "https://raw.githubusercontent.com/yupperdoo/If-Not-Now-When-Images/refs/heads/main/oYQXprL.png";
@@ -32,14 +32,14 @@ campaignTrail_temp.running_mate_json = JSON.parse("[{\"model\": \"campaign_trail
 
 campaignTrail_temp.opponents_default_json = JSON.parse("[{\"election\": 20, \"candidates\": [200, 201, 202, 119, 107]}, {\"election\": 16, \"candidates\": [167, 168, 166, 165]}, {\"election\": 3, \"candidates\": [19, 18, 17, 16]}, {\"election\": 9, \"candidates\": [77, 78, 79, 80]}, {\"election\": 15, \"candidates\": [154, 155, 152, 153]}, {\"election\": 10, \"candidates\": [93, 94, 91, 92]}, {\"election\": 4, \"candidates\": [23, 24, 25]}, {\"election\": 11, \"candidates\": [105, 106]}, {\"election\": 12, \"candidates\": [116, 118, 117]}, {\"election\": 14, \"candidates\": [143, 145, 144, 142]}, {\"election\": 5, \"candidates\": [22, 20, 21]}, {\"election\": 8, \"candidates\": [69, 70, 67, 68]}, {\"election\": 13, \"candidates\": [133, 134, 132, 131]}]");
 
-campaignTrail_temp.opponents_weighted_json = JSON.parse("[{\"election\": 20, \"candidates\": [200, 201, 202, 119, 107]}, {\"election\": 16, \"candidates\": [165, 166, 167, 168]}, {\"election\": 3, \"candidates\": [16, 17, 18, 19]}, {\"election\": 9, \"candidates\": [78, 77, 79, 80]}, {\"election\": 15, \"candidates\": [153, 152, 154, 155]}, {\"election\": 10, \"candidates\": [91, 92, 93]}, {\"election\": 4, \"candidates\": [23, 24, 25]}, {\"election\": 11, \"candidates\": [105, 106]}, {\"election\": 12, \"candidates\": [116, 117, 118]}, {\"election\": 14, \"candidates\": [142, 143, 144, 145]}, {\"election\": 5, \"candidates\": [21, 20, 22]}, {\"election\": 8, \"candidates\": [68, 67, 69, 70]}, {\"election\": 13, \"candidates\": [131, 134, 132, 133]}]");
+campaignTrail_temp.opponents_weighted_json = JSON.parse("[{\"election\": 20, \"candidates\": [200, 201, 202, 119, 107]}, {\"election\": 16, \"candidates\": [165, 166, 167, 168]}, {\"election\": 3, \"candidates\": [16, 17, 18, 19]}, {\"election\": 9, \"candidates\": [78, 77, 79, 80]}, {\"election\": 15, \"candidates\": [153, 152, 154, 155]}, {\"election\": 10, \"candidates\": [91, 92, 93]}, {\"election\": 4, \"candidates\": [23, 24, 25]}, {\"election\": 11, \"candidates\": [105, 106]}, {\"election\": 12, \"candidates\": [116, 117, 118]}, {\"election\": 14, \"candidates\": [142, 143, 144, 145]}, {\"election\": 5, \"candidates\": [21, 20, 22]}, {\"election\": 8, \"candidates\": [68, 67, 69, 70]}, {\"election\": 13, \"candidates\": [131, 134, 132, 133]}]");        
 
 campaignTrail_temp.candidate_dropout_json = JSON.parse("[{\"model\": \"campaign_trail.candidate_dropout\", \"pk\": 1, \"fields\": {\"candidate\": 36, \"affected_candidate\": 18, \"probability\": 1.0}}]");
 
 campaignTrail_temp.temp_election_list = [{"id": 20, "year": 1972, "is_premium": 0, "display_year": "If Not Now, When?"}];
 
 campaignTrail_temp.difficulty_level_json = JSON.parse("[{\"model\": \"campaign_trail.difficulty_level\", \"pk\": 1, \"fields\": {\"name\": \"Cakewalk\", \"multiplier\": 1.3}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 2, \"fields\": {\"name\": \"Very Easy\", \"multiplier\": 1.2}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 3, \"fields\": {\"name\": \"Easy\", \"multiplier\": 1.1}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 4, \"fields\": {\"name\": \"Normal\", \"multiplier\": 1.0}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 5, \"fields\": {\"name\": \"Hard\", \"multiplier\": 0.9}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 6, \"fields\": {\"name\": \"Impossible\", \"multiplier\": 0.8}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 7, \"fields\": {\"name\": \"Unthinkable\", \"multiplier\": 0.7}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 8, \"fields\": {\"name\": \"Blowout\", \"multiplier\": 0.6}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 9, \"fields\": {\"name\": \"Disaster\", \"multiplier\": 0.5}}]");
-
+ 
 campaignTrail_temp.credits = 'Yupperdoo. Coding, graphics, and copyediting done by Capitolbill. Research and sources provided by DrPurpleFetusYeeter. Original music code done by Thatchmaster. Special thanks to Shuichi, ForgottenPassword, Mr. Truman, BeshearStan, CalvinKool-Aid, WhatNameDidIUseAgain, Martha, Astro, and others for playtesting';
 
 RecReading = true;
@@ -76,12 +76,12 @@ setInterval(() => {
     };
     // const observer = new MutationObserver(callback);
     // observer.observe(windowsAdvisorTargetNode, windowsAdvisorConfig);
-
+    
     class Song {
         constructor(title, artist, coverLink, audioLink) {
             this.title = title;
             this.artist = artist;
-            this.coverLink = coverLink;
+            this.coverLink = coverLink; 
             this.audioLink = audioLink;
         }
         getTitle()     { return this.title; }
@@ -89,7 +89,7 @@ setInterval(() => {
         getCoverLink() { return this.coverLink; }
         getAudioLink() { return this.audioLink; }
     }
-
+    
     class Playlist {
         constructor() {
             this.songs = [];
@@ -110,7 +110,7 @@ setInterval(() => {
     }
     window.Playlist = Playlist;
     window.Song = Song;
-
+    
     function changePlaylist(newPlaylist) {
         playlist = newPlaylist;
         playlist.currentSongIndex = 0;
@@ -120,7 +120,7 @@ setInterval(() => {
         audio.play();
     }
     window.changePlaylist = changePlaylist;
-
+    
     function updateUI() {
         const currentSong = playlist.getCurrentSong();
         document.getElementById("track-title").textContent  = currentSong.getTitle();
@@ -130,10 +130,10 @@ setInterval(() => {
             coverArtElem.src = currentSong.getCoverLink();
         }
     }
-
+    
     function setupMusicPlayer() {
         playlist = new Playlist();
-
+    
 const newSong1 = new Song(
     "Top of the World",
     "The Carpenters",
@@ -428,7 +428,7 @@ const newSong42 = new Song(
     "https://audio.jukehost.co.uk/jr0W3gfT2cj4sSnWfgHhRaMvSviVG81x"
 );
 
-
+    
         playlist.addSong(newSong1);
         playlist.addSong(newSong2);
         playlist.addSong(newSong3);
@@ -470,7 +470,7 @@ const newSong42 = new Song(
         playlist.addSong(newSong40);
         playlist.addSong(newSong41);
         playlist.addSong(newSong42);
-
+    
         let audio = document.getElementById("audio");
         if (!audio) {
             audio = document.createElement("audio");
@@ -478,47 +478,47 @@ const newSong42 = new Song(
             document.body.appendChild(audio);
         }
         audio.src = playlist.getCurrentSong().getAudioLink();
-
+    
         const tapeRecorder = document.createElement("div");
         tapeRecorder.id = "tape-recorder";
         const gameWindow_player = document.getElementById("game_window");
         gameWindow_player.insertAdjacentElement("afterend", tapeRecorder);
-
+    
         const infoOverlay = document.createElement("div");
         infoOverlay.id = "info-overlay";
-
+    
         const titleDiv = document.createElement("div");
         titleDiv.id = "track-title";
-
+    
         const artistDiv = document.createElement("div");
         artistDiv.id = "track-artist";
-
+    
         infoOverlay.appendChild(titleDiv);
         infoOverlay.appendChild(artistDiv);
         tapeRecorder.appendChild(infoOverlay);
-
+    
         const coverWrapper = document.createElement("div");
         coverWrapper.id = "cover-wrapper";
         tapeRecorder.appendChild(coverWrapper);
-
+    
         const coverBG = document.createElement("img");
         coverBG.id = "cover-bg";
         coverBG.src = "https://i.imgur.com/E2mOaNa.png";
-
+    
         const coverArt = document.createElement("img");
         coverArt.id = "cover-art";
         coverArt.src = playlist.getCurrentSong().getCoverLink();
-
+    
         coverWrapper.appendChild(coverBG);
         coverWrapper.appendChild(coverArt);
-
+    
         const playerBottom = document.createElement("div");
         playerBottom.id = "player-bottom";
         tapeRecorder.appendChild(playerBottom);
-
+    
         const controlsOverlay = document.createElement("div");
         controlsOverlay.id = "controls-overlay";
-
+    
         const prevButton = document.createElement("button");
         prevButton.id = "prev-button";
         prevButton.textContent = "←";
@@ -531,7 +531,7 @@ const newSong42 = new Song(
             tapeRecorder.style.backgroundImage = "url('https://imgur.com/I7jF0Ak.gif')";
             toggleButton.textContent = "Stop";
         });
-
+    
         const nextButton = document.createElement("button");
         nextButton.id = "next-button";
         nextButton.textContent = "→";
@@ -544,7 +544,7 @@ const newSong42 = new Song(
             tapeRecorder.style.backgroundImage = "url('https://imgur.com/I7jF0Ak.gif')";
             toggleButton.textContent = "Stop";
         });
-
+    
         const volumeSlider = document.createElement("input");
         volumeSlider.id = "volume-slider";
         volumeSlider.type = "range";
@@ -555,7 +555,7 @@ const newSong42 = new Song(
             const volumeValue = parseFloat(this.value) / 100;
             audio.volume = volumeValue;
         });
-
+    
         const toggleButton = document.createElement("button");
         toggleButton.id = "toggle-button";
         tapeRecorder.style.backgroundImage = "url('https://imgur.com/I7jF0Ak.gif')";
@@ -571,30 +571,30 @@ const newSong42 = new Song(
                 toggleButton.textContent = "Start";
             }
         });
-
+    
         controlsOverlay.appendChild(prevButton);
         controlsOverlay.appendChild(nextButton);
         controlsOverlay.appendChild(volumeSlider);
         controlsOverlay.appendChild(toggleButton);
         playerBottom.appendChild(controlsOverlay);
-
+    
         const progressContainer = document.createElement("div");
         progressContainer.id = "progress-container";
-
+    
         const progressBar = document.createElement("input");
         progressBar.id = "progress-bar";
         progressBar.type = "range";
         progressBar.min = 0;
         progressBar.value = 0;
         progressBar.step = 1;
-
+    
         progressBar.addEventListener("input", (e) => {
             audio.currentTime = parseFloat(e.target.value);
         });
-
+    
         progressContainer.appendChild(progressBar);
         playerBottom.appendChild(progressContainer);
-
+    
         audio.addEventListener("ended", () => {
             playlist.playNext();
             updateUI();
@@ -604,15 +604,15 @@ const newSong42 = new Song(
             tapeRecorder.style.backgroundImage = "url('https://imgur.com/I7jF0Ak.gif')";
             toggleButton.textContent = "Stop";
         });
-
+    
         updateUI();
-
+    
         audio.addEventListener("timeupdate", () => {
             if (!audio.duration || isNaN(audio.duration)) return;
             progressBar.max = audio.duration;
             progressBar.value = audio.currentTime;
         });
-
+    
         audio.play().then(() => {
             tapeRecorder.style.backgroundImage = "url('https://imgur.com/I7jF0Ak.gif')";
             toggleButton.textContent = "Stop";
@@ -622,7 +622,7 @@ const newSong42 = new Song(
             toggleButton.textContent = "Start";
         });
     }
-
+    
     const style = document.createElement("style");
     style.textContent = `
     #tape-recorder {
@@ -654,7 +654,7 @@ const newSong42 = new Song(
       font-size: 14px;
       margin-top: 1px;
     }
-
+    
     #cover-wrapper {
       position: absolute;
       bottom: 10px;
@@ -677,7 +677,7 @@ const newSong42 = new Song(
       left: 50%;
       transform: translateX(-50%);
     }
-
+    
     #player-bottom {
       position: absolute;
       bottom: -5px;
@@ -695,7 +695,7 @@ const newSong42 = new Song(
       align-items: center;
       gap: 10px;
     }
-
+    
     #prev-button,
     #next-button,
     #toggle-button {
@@ -734,7 +734,7 @@ const newSong42 = new Song(
       border-style: inset;
       background-color: #e0e0e0;
     }
-
+    
     #volume-slider {
       -webkit-appearance: none;
       appearance: none;
@@ -769,7 +769,7 @@ const newSong42 = new Song(
       cursor: pointer;
       box-sizing: border-box;
     }
-
+    
     #progress-container {
       display: flex;
       flex-direction: row;
@@ -810,13 +810,13 @@ const newSong42 = new Song(
       cursor: pointer;
       box-sizing: border-box;
     }
-
+    
     #bonus_menu_area {
       margin-top: 120px;
     }
     `;
     document.head.appendChild(style);
-
+    
     setupMusicPlayer();
 
 HistHexcolour=["#C1440E","#0D4F8B","#D8A22B","#3F9E4D"];
@@ -826,7 +826,7 @@ HistHexcolour=["#C1440E","#0D4F8B","#D8A22B","#3F9E4D"];
         HistPVP=["60.67%","37.52%","1.42%","0.39%"];
         styling = document.createElement("style");
         document.head.appendChild(styling);
-
+        
         styling.innerHTML = `
         #opponent_selection_id_back {
             display: none;
