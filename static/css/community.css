@@ -851,3 +851,23 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* offline button & badge styles */
+.download-button.saved {
+  color: #4cd964 !important;
+}
+
+.download-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+@keyframes spin-anim {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin-icon {
+  display: inline-block;
+  animation: spin-anim 1s linear infinite;
+}

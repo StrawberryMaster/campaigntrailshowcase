@@ -4,6 +4,8 @@ const FAV = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke=
 const PLAY = `<svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" style="vertical-align: middle; transform: translateY(-1px);"><path d="M8 5v14l11-7z"/></svg>`;
 const EDIT = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; transform: translateY(-1px);"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
 const DELETE = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; transform: translateY(-1px);"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+const DOWNLOAD = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; transform: translateY(-1px);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
+const DOWNLOADED = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; transform: translateY(-1px);"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
 const NEW_RELEASE = "new";
 const ALL = "all";
 
@@ -18,6 +20,7 @@ window.customMod = false;
 let favoriteMods = new Set();
 
 let onlyFavorites = false;
+let onlyOffline = false;
 let showAllModsLegacy = false;
 
 // custom dialog modals
@@ -220,6 +223,7 @@ modViewTemplate.innerHTML = `
     <div class="hover-button-holder">
       <button class="mod-play-button hover-button"><span></span></button>
       <button class="hover-button fav-button"><span></span></button>
+      <button class="hover-button download-button" title="Save for offline play"><span></span></button>
       <button class="hover-button edit-button" style="display:none"><span></span></button>
       <button class="hover-button delete-button" style="display:none"><span></span></button>
     </div>
@@ -1333,6 +1337,7 @@ function createModView(mod, imageUrl = "", description = "Loading summary...") {
     image: modView.querySelector(".mod-image"),
     playBtn: modView.querySelector(".mod-play-button"),
     favBtn: modView.querySelector(".fav-button"),
+    downloadBtn: modView.querySelector(".download-button"),
     editBtn: modView.querySelector(".edit-button"),
     deleteBtn: modView.querySelector(".delete-button"),
     ratingBg: modView.querySelector(".rating-background"),
@@ -1362,6 +1367,75 @@ function createModView(mod, imageUrl = "", description = "Loading summary...") {
     modView._elements.favBtn.style.display = "";
     modView._elements.favBtn.querySelector("span").innerHTML = isFavorite(mod.value) ? UNFAV : FAV;
     modView._elements.favBtn.addEventListener("click", (e) => toggleFavorite(e, mod.value));
+  }
+
+  // download/offline button
+  if (modView._elements.downloadBtn) {
+    if (isCustom) {
+      modView._elements.downloadBtn.style.display = "none";
+    } else {
+      const isOfflineSaved = typeof isModSavedOffline === "function" && isModSavedOffline(mod.value);
+      modView._elements.downloadBtn.style.display = "";
+      if (isOfflineSaved) {
+        modView._elements.downloadBtn.classList.add("saved");
+        modView._elements.downloadBtn.querySelector("span").innerHTML = DOWNLOADED;
+        modView._elements.downloadBtn.title = "Saved for offline (click to remove)";
+      } else {
+        modView._elements.downloadBtn.classList.remove("saved");
+        modView._elements.downloadBtn.querySelector("span").innerHTML = DOWNLOAD;
+        modView._elements.downloadBtn.title = "Save for offline play";
+      }
+
+      modView._elements.downloadBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        if (typeof isModSavedOffline !== "function" || typeof saveModForOffline !== "function") {
+          await showCustomAlert("Offline storage is not supported in this environment.", "Notice");
+          return;
+        }
+
+        const currentlySaved = isModSavedOffline(mod.value);
+        if (currentlySaved) {
+          const confirmRemove = await showCustomConfirm(
+            `Remove "<b>${mod.innerText || mod.value}</b>" from offline storage?`,
+            "Remove offline mod"
+          );
+          if (confirmRemove) {
+            await deleteOfflineMod(mod.value);
+            modView._elements.downloadBtn.classList.remove("saved");
+            modView._elements.downloadBtn.querySelector("span").innerHTML = DOWNLOAD;
+            modView._elements.downloadBtn.title = "Save for offline play";
+            await showCustomAlert(`"<b>${mod.innerText || mod.value}</b>" removed from offline storage.`, "Removed");
+          }
+        } else {
+          const confirmDownload = await showCustomConfirm(
+            `Download "<b>${mod.innerText || mod.value}</b>" and all its assets for offline play?`,
+            "Save mod offline"
+          );
+          if (!confirmDownload) return;
+
+          const btn = modView._elements.downloadBtn;
+          btn.disabled = true;
+          btn.querySelector("span").innerHTML = `<span class="spin-icon">⏳</span>`;
+
+          try {
+            await saveModForOffline(mod.value, (progress) => {
+              btn.title = progress.message;
+            });
+            btn.classList.add("saved");
+            btn.querySelector("span").innerHTML = DOWNLOADED;
+            btn.title = "Saved for offline (Click to remove)";
+            await showCustomAlert(`"<b>${mod.innerText || mod.value}</b>" is now ready to play offline!`, "Download complete");
+          } catch (err) {
+            console.error("Offline download failed:", err);
+            btn.querySelector("span").innerHTML = DOWNLOAD;
+            btn.title = "Save for offline play";
+            await showCustomAlert(`Failed to save mod offline: ${err.message}`, "Download failed");
+          } finally {
+            btn.disabled = false;
+          }
+        }
+      });
+    }
   }
 
   // edit button
@@ -1923,8 +1997,9 @@ function getVisibleMods() {
         modName.includes(nameFilter)) &&
       modTags.some((tag) => activeTags.has(tag)) &&
       (!onlyFavorites || isFavorite(modName)) &&
+      (!onlyOffline || (typeof isModSavedOffline === "function" && isModSavedOffline(modName))) &&
       (!year || year.test(modName)) &&
-      (onlyFavorites || mode === ALL || modMode === mode)
+      (onlyFavorites || onlyOffline || mode === ALL || modMode === mode)
     ) {
       visibleMods.push(modView);
     }
@@ -1968,6 +2043,15 @@ function updateModViews(event) {
       modGrid.appendChild(noFavsMessage);
     }
     noFavsMessage.innerHTML = `You have no favorite mods. Press the ${FAV} button on any mod to see them here!`;
+    noFavsMessage.style.display = "block";
+  } else if (onlyOffline && visibleMods.length === 0) {
+    if (!noFavsMessage) {
+      noFavsMessage = document.createElement("div");
+      noFavsMessage.id = "no-favorites-message";
+      noFavsMessage.classList.add("no-favorites-message");
+      modGrid.appendChild(noFavsMessage);
+    }
+    noFavsMessage.innerHTML = `You haven't saved any mods for offline play yet. Click the ${DOWNLOAD} button on any mod to download and save it offline!`;
     noFavsMessage.style.display = "block";
   } else if (noFavsMessage) {
     noFavsMessage.style.display = "none";
@@ -2221,12 +2305,19 @@ function setCategory(event, category) {
   if (category instanceof RegExp) {
     year = category;
     onlyFavorites = false;
+    onlyOffline = false;
   } else if (category === "all") {
     year = null;
     onlyFavorites = false;
+    onlyOffline = false;
   } else if (category === "favorites") {
     year = null;
     onlyFavorites = true;
+    onlyOffline = false;
+  } else if (category === "offline") {
+    year = null;
+    onlyFavorites = false;
+    onlyOffline = true;
   }
 
   currentPage = 1; // reset to first page when category changes
@@ -2386,7 +2477,11 @@ async function loadModFromButton(modValue) {
       window.customMod = false;
     } catch (error) {
       console.error(`Failed to load mod ${modValue}:`, error);
-      await showCustomAlert(`Failed to load mod ${modValue}. See console for details.`, "Error");
+      if (!navigator.onLine && (!window.isModSavedOffline || !window.isModSavedOffline(modValue))) {
+        await showCustomAlert(`You are currently offline, and "<b>${modValue}</b>" was not saved for offline play. Please connect to the internet and click the download icon on this mod's card to save it for offline use.`, "Offline mod required");
+      } else {
+        await showCustomAlert(`Failed to load mod ${modValue}. See console for details.`, "Error");
+      }
       return;
     }
   }
