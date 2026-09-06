@@ -5,6 +5,7 @@ const MODS_CACHE_NAME = 'cts-mods-cache-v1';
 const CORE_STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/manifest.webmanifest',
   '/campaign-trail/',
   '/campaign-trail/index.html',
   '/static/34starcircle-2.png',

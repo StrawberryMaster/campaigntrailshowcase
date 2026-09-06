@@ -1,0 +1,20 @@
+{
+  "name": "Campaign Trail Showcase",
+  "short_name": "CTS",
+  "description": "Play presidential election scenarios across real and alternate timelines, including community-made custom mods.",
+  "start_url": "/campaign-trail/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#222449",
+  "theme_color": "#3a3360",
+  "icons": [
+    {
+      "src": "/static/34starcircle-2.png",
+      "sizes": "111x111",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["games", "entertainment", "education"]
+}
