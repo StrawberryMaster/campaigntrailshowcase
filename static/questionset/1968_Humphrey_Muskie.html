@@ -4,167 +4,225 @@
 
 <script>
 
+campaignTrail_temp.multiple_endings = true;
+
+function getStateName(id) {
+  const stateObj = campaignTrail_temp.states_json?.find((s) => s.pk === Number(id));
+  return stateObj ? stateObj.fields.name : "";
+}
+
 function establishDialogueBox() {
-	document.getElementById("game_window").innerHTML = "<div id='dialogueBox' style='width:95%; height:33%; background-color:black;border-style:solid;border-width:5px;border-color:white;padding:20px;'><font id='dialogueText' color='white' size='5'></font></div>"
+  const gameWindow = document.getElementById("game_window");
+  if (!gameWindow) return;
+
+  gameWindow.innerHTML = `
+    <div id="dialogueBox" style="
+      box-sizing: border-box;
+      width: 95%;
+      min-height: 160px;
+      margin: 20px auto;
+      background-color: #000;
+      border: 5px solid #fff;
+      padding: 20px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 20px;
+      color: #fff;
+      line-height: 1.5;
+    ">
+      <span id="dialogueText"></span>
+    </div>
+  `;
 }
-function runDialogue(texttorun) {
-	box = document.getElementById("dialogueBox")
-	text = document.getElementById("dialogueText")
-	text.innerHTML = ""
-	for (i in texttorun) {
-		if (i == texttorun.length-1) { 
-			window.setTimeout(new Function('document.getElementById("dialogueText").innerHTML+="'+texttorun[i]+'";nextTask()'),50+i*50)
-		}
-		if (texttorun[i] == '<') {
-			window.setTimeout(new Function('document.getElementById("dialogueText").innerHTML+="<br>"'),50+i*50)
-		}
-		else if (texttorun[i] != "^") 
-			window.setTimeout(new Function('document.getElementById("dialogueText").innerHTML+="'+texttorun[i]+'"'),50+i*50)
-	}
-}
-function nextTask() {
-	document.body.background="https://dm0qx8t0i9gc9.cloudfront.net/thumbnails/video/VA6SJW4tgijzcn7ja/flight-in-deep-space_hg5q9th-l_thumbnail-1080_01.png"
-document.getElementById("game_window").innerHTML="<image src='https://cdn.discordapp.com/attachments/934939811347836958/942282384945057822/nixonhell.gif' width='950'></image><audio src='https://cdn.discordapp.com/attachments/810034515334004766/942285403992494140/nix.mp3' autoplay='true' style='display:none' loop='true'></audio>"
-document.getElementById("header").src="https://cdn.discordapp.com/attachments/901463960488919080/942200807779086426/unknown.png"
-}
-function videoDone() {
-	(function(w){w = w || window; var i = w.setInterval(function(){},100000); while(i>=0) { w.clearInterval(i--); }})(/*window*/);
-	establishDialogueBox()
-	runDialogue("* Ha^^ ha^^ ha^^ ha^^^^^^...<^^^^^^^^^^^^^^^^^^* Did you REALLY think it was OVER!?!?<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^* I mean, we haven't even shown you what happens when Wallace wins every state yet...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-}
-function getState(id) {
-        for (z in campaignTrail_temp.states_json) {
-            if (campaignTrail_temp.states_json[z].pk == id) {
-                return campaignTrail_temp.states_json[z].fields.name
-            }
-        }
-    }
-    currsmall = 100
-    currstate = ""
-    for (i in campaignTrail_temp.final_state_results) {
-        margin = campaignTrail_temp.final_state_results[i].result[0].percent - campaignTrail_temp.final_state_results[i].result[1].percent
-        if (margin < currsmall && campaignTrail_temp.final_state_results[i].result[0].candidate == 24) {
-            currsmall = margin
-            currstate = campaignTrail_temp.final_state_results[i].state
-        }
-    }	
-used=false
-for (i in campaignTrail_temp.election_json) {
-    {
-        if (campaignTrail_temp.election_json[i].pk == campaignTrail_temp.election_id) {
-            year = campaignTrail_temp.temp_election_list[i].display_year;
-        }
-    }
-}
-if (year == "1968") {
 
-function endingPicker(out, totv, aa, quickstats) {
-    // Nixon=23,Humphrey=24,Wallace=25
-    orderID = [aa[0].candidate, aa[1].candidate, aa[2].candidate];
-    playerID = campaignTrail_temp.candidate_id;
-    playerEV = quickstats[0]
-    playerlost = true
-    popvotemessage = "";
-    marginmessage = "";
-    extramessage = "";
-    titlemessage = "Sorry, you lost the 1968 election.";
-    popwon = true;
-    margin = 0
-    closeststate = getState(currstate)
+async function runDialogue(textToRun) {
+  const textEl = document.getElementById("dialogueText");
+  if (!textEl) return;
+  textEl.innerHTML = "";
 
-    if (playerID == 23 && playerEV == 538) {
-        //Nixon 538
-      return "<h3>Order!</h3><p>Richard M Nixon, how do you plead on 1 count of treason against the United States of America, 1 count of misappropriation of campaign funds, 1 count of obstruction of justice, one count of abuse of power, one count of…</p><p>Richard Nixon, as he heard all this droning from the judge, closed his eyes, waiting for the sentence to end. He had been up all night, unable to sleep due to all the stress from the trial. Before he knew it, he’d fallen unconscious. All of a sudden, he jolted awake to the sound of the judge screaming; \"NIXON! What do you plead?...\"</p><p>\"Uh, not guilty, your honour… not guilty?\"</p><p>\"On 1 count of sleeping in a court of law?...\"</p><p>\"When did you say tha- actually yes, your honour. The liberal media has been painting an askew picture of me. I was merely resting my eyes.\"</p>"
-    }
-    if (playerID == 24 && playerEV == 538) {
-        titlemessage=""
-       return "<h3>Hubert Humphrey's inauguration address, January 20th, 1969.</h3><p>Today I have stood, where once Abraham Lincoln stood and took an oath to my country. It is very appropriate then that from this bastion of America, this very heart of the great men who created the principles of freedom in this country, that today we sound the drum for freedom as have our generations of forebears before us done, time and time again through history. Let us rise to the call of freedom-loving blood that is in us and send our answer to the tyranny that clanks its chains upon the Negro. In the name of the greatest country that has ever trod this earth, I draw the line in the dust and toss the gauntlet before the feet of tyranny . . . and I say . . . desegregation today . . . desegregation tomorrow . . . desegregation forever!</p>"
-    }
-    if (out == "tie") {
-        return false
-    }
-    if (aa[1].popular_votes > aa[0].popular_votes) {
-        popwon = false;
-    }
-
-
-    if (out == "win") {
-        playerlost = false
-        titlemessage = "Congratulations! You won the 1968 election!"
-    }
-    if (playerID == 23) {
-        if (playerlost == false) {
-            extramessage = "The murders and rioting in America will be your first order of business, and more long term, the war on Vietnam. If both of those are dealt with, your silent majority will be pleased. Other than that, inflation must be dealt with, as well as the excess of Great Society. Good luck, and welcome back to the executive branch!"
-            if (playerEV > 400) {
-                marginmessage = "Congratulations! Despite the intense battle from Humphrey and Wallace, you have disproven the doubters and redeemed your name. Your performance in debates and campaigning were widely praised compared to 1960, which allowed you to win with a massive landslide. What a turnaround from 1964!" 
-            } else if (playerEV > 301) {
-                marginmessage = "Congratulations! Despite the intense battle from Humphrey and Wallace, you have disproven the doubters and redeemed your name. Your lead dwindled a bit as Wallace’s appeal dampened, but your coalition managed to remain intact."
-
-            } else {
-                marginmessage = "Congratulations! Despite the intense battle from Humphrey and Wallace, you have disproven the doubters and redeemed your name. The bombing halt and Wallace collapsing in the north nearly lost you the election, but you managed to hang on.";
-            }
-            if (popwon = false) {
-                popvotemessage = "For the first time since 1888, the winner of the electoral vote lost the popular vote. It seems many people underestimated how much of an effect Wallace had on your campaign in the south.";
-            }
-        } else {
-            extramessage = "After your second loss in a presidential election, your chances of being renominated for the presidency, or ANYTHING for that matter is nearly zero. Retirement and an elder statesman position are all that will await you. It seems Americans will once and for all not have Nixon to kick around…"
-            if (playerEV > 218) {
-                marginmessage = " Despite the environment seemingly being perfect for a Nixon comeback, you had a sudden and shocking reversal of fortunes, and have lost yet another presidential election. Republicans are shocked they have now lost 7 of the last 9 presidential elections. With the margins being as close as 8 years ago, you are already having flashbacks of 1960."
-            } else if (playerEV > 152) {
-
-                marginmessage = " Despite the environment seemingly being perfect for a Nixon comeback, you had a sudden and shocking reversal of fortunes, and have lost yet another presidential election. Republicans are shocked they have now lost 8 of the last 10 presidential elections. Somehow you managed to do worse compared to 1960. Nobody is quite sure how that is even possible, but suffice it to say you will receive much of the blame." 
-            } else {
-                marginmessage = " Despite the environment seemingly being perfect for a Nixon comeback, you had a sudden and shocking reversal of fortunes, and have lost yet another presidential election. Republicans are shocked they have now lost 8 of the last 10 presidential elections. Not only did you lose, but you got crushed. Under the weight of two ideologically different candidates, your moderate positions seemed to not appeal. If the skirmish between liberal and conservative republicans wasn’t already bad, it was going to get a lot worse after this." 
-
-            }
-            if (popwon = false) {
-                popvotemessage = "At the end of the day, in possibly the most shocking turn of events, the popular vote fell in your favour. Nobody is sure what to make of this, but maybe the Democrats can use their house and senate supermajorities, combined with disaffected Republicans, to pass electoral reform?";
-            }
-        }
-    } else if (playerID == 24) {
-        if (playerlost == true) {
-            extramessage = "A return to the Senate might be in order, so you might defend liberalism from demise during Nixon's administration, or gearing up for a run in 1972. perhaps you can do both. In any case, let's hope Nixon can cool tensions in America and bring the troops home.";
-            if (playerEV > 235) {
-                marginmessage = "Despite your best efforts in a tough climate, Richard Nixon will succeed Johnson in the presidency. It was always going to be difficult being so closely associated with an unpopular administration, in a divided party. You still fought hard, and took Nixon to the brink as Kennedy did in 60."
-            } else if (playerEV > 200) {
-                marginmessage = "Despite your best efforts in a tough climate, Richard Nixon will succeed Johnson in the presidency. It was always going to be difficult being so closely associated with an unpopular administration, in a divided party. The crime and rioting took a toll on your campaign hard, and Nixon's law and order theme really hit home for many Americans."
-            } else {
-                marginmessage = "Despite your best efforts in a tough climate, Richard Nixon will succeed Johnson in the presidency. It was always going to be difficult being so closely associated with an unpopular administration, in a divided party. It seems liberalism very well might be over with this loss, as you have been crushed. A more moderate candidate in 4 years will likely be chosen."
-            }
-        } else {
-            extramessage = "Your first course of action is to fix what Johnson caused. Vietnam and the riots need to be dealt with. Johnson might not like how you deal with it, but this is your administration, and you'll deal with it the way you do. Act quickly, or you just might become as unpopular as Johnson.";
-            if (playerEV > 341) {
-                marginmessage = "The happy warrior rises! Despite a climate of chaos and a split in the Democratic Party, you've beaten back the opposition and secured a third term for the Democrats. Johnson breathes a sigh of relief after this, and poor Nixon is once again a loser. To the shock of pundits countrywide, you beat Nixon and Wallace handily. The bombing halt and your inspiring words compared to Nixon must have won it for you."
-            } else if (playerEV > 300) {
-                marginmessage = "The happy warrior rises! Despite a climate of chaos and a split in the Democratic Party, you've beaten back the opposition and secured a third term for the Democrats. Johnson breathes a sigh of relief after this, and poor Nixon is once again a loser. It seems America is ready to give the New Deal Democrats one last chance. If you succeed, you might be able to rebuild the coalition that's won them so many elections (well, not the Deep South, but you knew that)."
-            } else {
-                marginmessage = "The happy warrior rises! Despite a climate of chaos and a split in the Democratic Party, you've beaten back the opposition and secured a third term for the Democrats. Johnson breathes a sigh of relief after this, and poor Nixon is once again a loser. He did quite well, however, so you best work hard, lest the midterms act mercilessly."
-            }
-        }
+  for (const char of textToRun) {
+    if (char === "^") {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    } else if (char === "<") {
+      // line break
+      textEl.innerHTML += "<br>";
+      await new Promise((resolve) => setTimeout(resolve, 50));
     } else {
-        titlemessage = "As expected, you lost the 1968 election"
-        extramessage = "What happens next is your choice. Another governorship wouldn't hurt, and perhaps you can run again in 4 years if you're up to it. Unfortunately (for you), civil rights will persist."
-        if (campaignTrail_temp.final_outcome !== "tie") {
-            if (playerEV > 532) {
-				return "<video src='https://onedrive.live.com/download?cid=B4810B629FA38CE2&resid=B4810B629FA38CE2%2149274&authkey=AD54VgC-hON5rsg' onended='videoDone()' autoplay='true' width='500'></video>"
-            } else if (playerEV > 269) {
-                titlemessage = "Unbelievable! You won the 1968 election!"
-                marginmessage = "In a shock to all parties involved, neither Hubert Horatio Humphrey nor Richard Milhous Nixon will be the next president of the United States. Somehow, you managed to come out on top. Southerners are ecstatic, liberals are foaming at the mouth, and the black population has never been more fearful."
-                extramessage = "Pundits are shocked, trying to figure out how you managed to capture states outside the deep south to win it all. What happens next is entirely unknown. Its likely a crusader against the civil rights bill will happen, as well as the deconstruction of Great Society, and the escalation of Vietnam. Whatever happens, sit back and relax knowing you've done the greatest upset in US political history! "
-
-            } else if (playerEV > 90) {
-                marginmessage = "As most expected, you've lost. This isn't a surprise, as you're a third party. even worse, your second goal of deadlocking the electoral college failed. You did, however, come very close, picking up a number of states you weren't expected to pick up. It seems that your crusade for the south turned out really well. You could run in four years perhaps, and try and win the same coalition, trying to deadlock the election then. You've sent a clear message to the Democrats; the south isn't to be ignored,"
-            } else if (playerEV > 77) {
-                marginmessage = "As most expected, you've lost. This isn't a surprise, as you're a third party. even worse, your second goal of deadlocking the electoral college failed. You did, however, poll a bit higher above what you were set to win. So good job outdoing your predictions. The south isn't done yet, as you've shown here."
-            } else {
-                marginmessage = "As most expected, you've lost. This isn't a surprise, as you're a third party. even worse, your second goal of deadlocking the electoral college failed. You won just about as much as expected, and yet it wasn't enough. Your supporters are disillusioned that you weren't able to deadlock the college. That's how it is, though..."
-            }
-        }
+      textEl.innerHTML += char;
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
-marginmessage += popvotemessage
-return "<h3>" + titlemessage + "</h3><p>" + marginmessage + "<p>" + "<p>" + extramessage;	
+  }
+
+  nextTask();
 }
+
+function nextTask() {
+  document.body.style.backgroundImage =
+    "url('https://dm0qx8t0i9gc9.cloudfront.net/thumbnails/video/VA6SJW4tgijzcn7ja/flight-in-deep-space_hg5q9th-l_thumbnail-1080_01.png')";
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundRepeat = "no-repeat";
+
+  const gameWindow = document.getElementById("game_window");
+  if (gameWindow) {
+    gameWindow.innerHTML = `
+      <img src="https://web.archive.org/web/20231212034944if_/https://cdn.discordapp.com/attachments/934939811347836958/942282384945057822/nixonhell.gif" alt="Nixon Hell" style="width: 100%; max-width: 950px; display: block; margin: 0 auto;" />
+      <audio src="https://web.archive.org/web/20231212012226/https://cdn.discordapp.com/attachments/810034515334004766/942285403992494140/nix.mp3" autoplay loop style="display:none;"></audio>
+    `;
+  }
+
+  const header = document.getElementById("header");
+  if (header) {
+    header.src = "https://web.archive.org/web/20231212032731if_/https://cdn.discordapp.com/attachments/901463960488919080/942200807779086426/unknown.png";
+  }
 }
+
+window.videoDone = function () {
+  if (window.results_timeout) {
+    clearTimeout(window.results_timeout);
+  }
+
+  let timerId = window.setTimeout(() => {}, 0);
+  while (timerId--) {
+    window.clearTimeout(timerId);
+  }
+
+  establishDialogueBox();
+  runDialogue(
+    "* Ha^^ ha^^ ha^^ ha^^^^^^...<^^^^^^^^^^^^^^^^^^* Did you REALLY think it was OVER!?!?<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^* I mean, we haven't even shown you what happens when Wallace wins every state yet...^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+  );
+};
+
+endingPicker = function (out, totv, aa, quickstats) {
+  const playerID = campaignTrail_temp.candidate_id;
+  const playerEV = quickstats[0];
+
+  if (playerID === 23 && playerEV === 538) {
+    return (
+      "<h3>Order!</h3>" +
+      "<p>Richard M. Nixon, how do you plead on one count of treason against the United States of America, one count of misappropriation of campaign funds, one count of obstruction of justice, one count of abuse of power, and one count of…</p>" +
+      "<p>Richard Nixon, hearing all this droning from the judge, closed his eyes, waiting for the sentencing to end. He had been up all night, unable to sleep due to all the stress from the trial. Before he knew it, he had fallen unconscious. All of a sudden, he jolted awake to the sound of the judge screaming: \"NIXON! How do you plead?...\"</p>" +
+      "<p>\"Uh, not guilty, Your Honor… not guilty?\"</p>" +
+      "<p>\"To one count of sleeping in a court of law?...\"</p>" +
+      "<p>\"When did you say tha—actually yes, Your Honor. The liberal media has been painting a skewed picture of me. I was merely resting my eyes.\"</p>"
+    );
+  }
+
+  if (playerID === 24 && playerEV === 538) {
+    return (
+      "<h3>Hubert Humphrey's Inaugural Address, January 20, 1969</h3>" +
+      "<p>Today I have stood where once Abraham Lincoln stood and took an oath to my country. It is very appropriate then that from this bastion of America, this very heart of the great men who created the principles of freedom in this country, that today we sound the drum for freedom as our generations of forebears have done before us, time and time again through history. Let us rise to the call of freedom-loving blood that is in us and send our answer to the tyranny that clanks its chains upon the Negro. In the name of the greatest country that has ever trod this earth, I draw the line in the dust and toss the gauntlet before the feet of tyranny . . . and I say . . . desegregation today . . . desegregation tomorrow . . . desegregation forever!</p>"
+    );
+  }
+
+  if (out === "tie") {
+    return false;
+  }
+
+  const pvWinner = [...aa].sort((a, b) => b.popular_votes - a.popular_votes)[0]?.candidate;
+  const playerWonPV = pvWinner === playerID;
+  const playerWonEV = out === "win";
+
+  let titlemessage = playerWonEV
+    ? "Congratulations! You won the 1968 election!"
+    : "Sorry, you lost the 1968 election.";
+  let marginmessage = "";
+  let extramessage = "";
+  let popvotemessage = "";
+
+  if (playerID === 23) {
+    if (playerWonEV) {
+      extramessage =
+        "The murders and rioting in America will be your first order of business, and in the longer term, the war in Vietnam. If both of those are dealt with, your silent majority will be pleased. Other than that, inflation must be curbed, as well as the excesses of the Great Society. Good luck, and welcome back to the executive branch!";
+      if (playerEV > 400) {
+        marginmessage =
+          "Congratulations! Despite the intense battle from Humphrey and Wallace, you have disproven the doubters and redeemed your name. Your disciplined campaigning and sharp debate strategy were widely praised compared to 1960, allowing you to win in a massive landslide. What a turnaround from 1964!";
+      } else if (playerEV > 301) {
+        marginmessage =
+          "Congratulations! Despite the intense battle from Humphrey and Wallace, you have disproven the doubters and redeemed your name. Your lead dwindled a bit as Wallace’s appeal waned, but your coalition managed to remain intact.";
+      } else {
+        marginmessage =
+          "Congratulations! Despite the intense battle from Humphrey and Wallace, you have disproven the doubters and redeemed your name. The bombing halt and Wallace's collapse in the North nearly cost you the election, but you managed to hang on.";
+      }
+
+      if (!playerWonPV) {
+        popvotemessage =
+          " For the first time since 1888, the winner of the electoral vote lost the popular vote. It seems many people underestimated how much of an effect Wallace had on your campaign in the South.";
+      }
+    } else {
+      extramessage =
+        "After your second loss in a presidential election, your chances of being renominated for the presidency, or anything else for that matter, are nearly zero. Retirement and an elder statesman position are all that await you. It seems Americans will, once and for all, not have Nixon to kick around anymore…";
+      if (playerEV > 218) {
+        marginmessage =
+          "Despite the environment seemingly being perfect for a Nixon comeback, you suffered a sudden and shocking reversal of fortune, losing yet another presidential election. Republicans are stunned to have now lost 8 of the last 10 presidential elections. With the margins as close as they were eight years ago, you are already having flashbacks to 1960.";
+      } else if (playerEV > 152) {
+        marginmessage =
+          "Despite the environment seemingly being perfect for a Nixon comeback, you suffered a sudden and shocking reversal of fortune, losing yet another presidential election. Republicans are stunned to have now lost 8 of the last 10 presidential elections. Somehow you managed to fare worse than in 1960. Nobody is quite sure how that was even possible, but suffice it to say you will receive much of the blame.";
+      } else {
+        marginmessage =
+          "Despite the environment seemingly being perfect for a Nixon comeback, you suffered a sudden and shocking reversal of fortune, losing yet another presidential election. Republicans are stunned to have now lost 8 of the last 10 presidential elections. Not only did you lose, but you were crushed. Under the weight of two ideologically distinct opponents, your moderate positions failed to appeal. If the skirmish between liberal and conservative Republicans was not already bad, it is going to get a lot worse after this.";
+      }
+
+      if (playerWonPV) {
+        popvotemessage =
+          " At the end of the day, in possibly the most shocking turn of events, the popular vote fell in your favor. Nobody is sure what to make of this, but perhaps the Democrats can use their House and Senate majorities, combined with disaffected Republicans, to pass electoral reform.";
+      }
+    }
+  } else if (playerID === 24) {
+    if (!playerWonEV) {
+      extramessage =
+        "A return to the Senate might be in order, where you can defend liberalism from demise during Nixon's administration or gear up for a run in 1972. Perhaps you can do both. In any case, let's hope Nixon can cool tensions in America and bring the troops home.";
+      if (playerEV > 235) {
+        marginmessage =
+          "Despite your best efforts in a tough climate, Richard Nixon will succeed Johnson in the presidency. It was always going to be difficult being so closely associated with an unpopular administration in a divided party. You still fought hard, taking Nixon to the brink just as he did with Kennedy in 1960.";
+      } else if (playerEV > 200) {
+        marginmessage =
+          "Despite your best efforts in a tough climate, Richard Nixon will succeed Johnson in the presidency. It was always going to be difficult being so closely associated with an unpopular administration in a divided party. High crime and urban rioting took a heavy toll on your campaign, and Nixon's law-and-order theme really hit home for many Americans.";
+      } else {
+        marginmessage =
+          "Despite your best efforts in a tough climate, Richard Nixon will succeed Johnson in the presidency. It was always going to be difficult being so closely associated with an unpopular administration in a divided party. It seems liberalism might very well be finished with this loss, as you have been crushed. A more moderate candidate will likely be chosen in four years.";
+      }
+    } else {
+      extramessage =
+        "Your first course of action is to fix the crises that mounted under Johnson. Vietnam and the riots need to be dealt with. Johnson might not like how you handle them, but this is your administration, and you will govern your own way. Act quickly, or you just might become as unpopular as Johnson.";
+      if (playerEV > 341) {
+        marginmessage =
+          "The Happy Warrior rises! Despite a climate of chaos and a bitter split in the Democratic Party, you've beaten back the opposition and secured a third consecutive term for the Democrats. Johnson breathes a sigh of relief, and poor Nixon is once again a loser. To the shock of pundits nationwide, you beat Nixon and Wallace handily. The bombing halt and your inspiring rhetoric must have carried the day.";
+      } else if (playerEV > 300) {
+        marginmessage =
+          "The Happy Warrior rises! Despite a climate of chaos and a bitter split in the Democratic Party, you've beaten back the opposition and secured a third consecutive term for the Democrats. Johnson breathes a sigh of relief, and poor Nixon is once again a loser. It seems America is ready to give the New Deal Democrats one last chance. If you succeed, you might be able to rebuild the coalition that won them so many elections (well, not in the Deep South, but you already knew that).";
+      } else {
+        marginmessage =
+          "The Happy Warrior rises! Despite a climate of chaos and a bitter split in the Democratic Party, you've beaten back the opposition and secured a third consecutive term for the Democrats. Johnson breathes a sigh of relief, and poor Nixon is once again a loser. He performed respectably, however, so you had best work hard, lest the midterm elections prove merciless.";
+      }
+    }
+  } else {
+    titlemessage = "As expected, you lost the 1968 election.";
+    extramessage =
+      "What happens next is your choice. Another term as governor wouldn't hurt, and perhaps you can run again in four years if you're up to it. Unfortunately (for you), civil rights will persist.";
+
+    if (playerEV > 532) {
+      return "<video src='https://onedrive.live.com/download?cid=B4810B629FA38CE2&resid=B4810B629FA38CE2%2149274&authkey=AD54VgC-hON5rsg' onended='window.videoDone()' autoplay width='500'></video>";
+    } else if (playerEV > 269) {
+      titlemessage = "Unbelievable! You won the 1968 election!";
+      marginmessage =
+        "In a shock to all parties involved, neither Hubert Horatio Humphrey nor Richard Milhous Nixon will be the next president of the United States. Somehow, you managed to come out on top. Southerners are ecstatic, liberals are foaming at the mouth, and the Black population has never been more fearful.";
+      extramessage =
+        "Pundits are stunned, scrambling to figure out how you managed to capture states outside the Deep South to win it all. What happens next is entirely unknown. It's likely a crusade against civil rights legislation will begin, along with the dismantling of the Great Society and the escalation of the war in Vietnam. Whatever happens, sit back and relax knowing you've pulled off the greatest upset in American political history!";
+    } else if (playerEV > 90) {
+      marginmessage =
+        "As most expected, you lost. This isn't a surprise, as you're a third-party candidate. Even worse, your primary goal of deadlocking the Electoral College failed. You did, however, come very close, picking up a number of states outside your core base. It seems your Southern crusade turned out remarkably well. You could perhaps run again in four years to mobilize that same coalition and deadlock the election then. You've sent a clear message to the Democrats: the South isn't to be ignored.";
+    } else if (playerEV > 77) {
+      marginmessage =
+        "As most expected, you lost. This isn't a surprise, as you're a third-party candidate. Even worse, your primary goal of deadlocking the Electoral College failed. You did, however, finish ahead of expectations in several key states. The South isn't done yet, as you've shown here.";
+    } else {
+      marginmessage =
+        "As most expected, you lost. This isn't a surprise, as you're a third-party candidate. Even worse, your primary goal of deadlocking the Electoral College failed. You won about as much as expected, and yet it wasn't enough. Your supporters are disillusioned that you weren't able to force the election into the House. That's how it goes, though...";
+    }
+  }
+
+  marginmessage += popvotemessage;
+  return `<h3>${titlemessage}</h3><p>${marginmessage}</p><p>${extramessage}</p>`;
+};
+
 campaignTrail_temp.questions_json = [
     {
         "model": "campaign_trail.question",
@@ -11521,11 +11579,12 @@ campaignTrail_temp.game_start_logging_id = '3663275';
         setQuestionShuffle(segments);
     };
     
-    const originalQuestionHTML = window.questionHTML;
+    const baseQuestions = campaignTrail_temp.questions_json;
     
     function performShuffle() {
         if (campaignTrail_temp.__shuffleExecuted) return;
         campaignTrail_temp.__shuffleExecuted = true;
+        if (campaignTrail_temp.questions_json !== baseQuestions) return;
         
         const qArr = campaignTrail_temp.questions_json;
         if (!Array.isArray(qArr) || qArr.length <= 1) return;
@@ -11583,12 +11642,9 @@ campaignTrail_temp.game_start_logging_id = '3663275';
         console.info("Question shuffle completed.", newOrder);
     }
     
-    window.questionHTML = function(...args) {
-        try { performShuffle(); } catch (err) {
-            console.error("Question shuffle error:", err);
-        }
-        return originalQuestionHTML.apply(this, args);
-    };
+    try { performShuffle(); } catch (err) {
+        console.error("Question shuffle error:", err);
+    }
 })();
 
 shuffleQuestions([3, 24]);

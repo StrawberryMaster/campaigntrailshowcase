@@ -10740,6 +10740,7 @@ campaignTrail_temp.game_start_logging_id = '3662481';
     window.shuffleQuestions = function(...ranges) {
         const qArr = campaignTrail_temp.questions_json;
         if (!Array.isArray(qArr)) return;
+        const questionCount = qArr.length;
         
         const segments = [];
         const shuffleRanges = ranges.sort((a, b) => a[0] - b[0]);
@@ -10752,21 +10753,23 @@ campaignTrail_temp.game_start_logging_id = '3662481';
             segments.push([start, end, 'shuffle']);
             currentPos = end + 1;
         }
-        if (currentPos <= 25) {
-            segments.push([currentPos, 25, 'fixed']);
+        if (currentPos <= questionCount) {
+            segments.push([currentPos, questionCount, 'fixed']);
         }
         
         setQuestionShuffle(segments);
     };
     
-    const originalQuestionHTML = window.questionHTML;
+    const baseQuestions = campaignTrail_temp.questions_json;
     
     function performShuffle() {
         if (campaignTrail_temp.__shuffleExecuted) return;
         campaignTrail_temp.__shuffleExecuted = true;
+        if (campaignTrail_temp.questions_json !== baseQuestions) return;
         
         const qArr = campaignTrail_temp.questions_json;
         if (!Array.isArray(qArr) || qArr.length <= 1) return;
+        const questionCount = qArr.length;
         
         if (!shuffleConfig) {
             shuffleConfig = [
@@ -10776,13 +10779,13 @@ campaignTrail_temp.game_start_logging_id = '3662481';
             ];
         }
         
-        const newOrder = new Array(25);
+        const newOrder = new Array(questionCount);
         const fixedPositions = new Set();
         
         // identify and place fixed questions
         for (const {start, end, type} of shuffleConfig) {
-            if (type === 'fixed' && start <= 25) {
-                for (let pos = start; pos <= Math.min(end, 25); pos++) {
+            if (type === 'fixed' && start <= questionCount) {
+                for (let pos = start; pos <= Math.min(end, questionCount); pos++) {
                     const idx = pos - 1;
                     newOrder[idx] = qArr[idx];
                     fixedPositions.add(idx);
@@ -10807,8 +10810,8 @@ campaignTrail_temp.game_start_logging_id = '3662481';
         // fill shuffle ranges from the shuffled pool
         let poolIdx = 0;
         for (const {start, end, type} of shuffleConfig) {
-            if (type === 'shuffle' && start <= 25) {
-                for (let pos = start; pos <= Math.min(end, 25); pos++) {
+            if (type === 'shuffle' && start <= questionCount) {
+                for (let pos = start; pos <= Math.min(end, questionCount); pos++) {
                     const idx = pos - 1;
                     if (poolIdx < pool.length) {
                         newOrder[idx] = pool[poolIdx++];
@@ -10821,12 +10824,9 @@ campaignTrail_temp.game_start_logging_id = '3662481';
         console.info("Question shuffle completed.", newOrder);
     }
     
-    window.questionHTML = function(...args) {
-        try { performShuffle(); } catch (err) {
-            console.error("Question shuffle error:", err);
-        }
-        return originalQuestionHTML.apply(this, args);
-    };
+    try { performShuffle(); } catch (err) {
+        console.error("Question shuffle error:", err);
+    }
 })();
 
 shuffleQuestions([9, 24]);

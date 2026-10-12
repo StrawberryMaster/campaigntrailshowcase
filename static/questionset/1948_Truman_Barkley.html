@@ -11677,11 +11677,12 @@ campaignTrail_temp.game_start_logging_id = '3668400';
         setQuestionShuffle(segments);
     };
     
-    const originalQuestionHTML = window.questionHTML;
+    const baseQuestions = campaignTrail_temp.questions_json;
     
     function performShuffle() {
         if (campaignTrail_temp.__shuffleExecuted) return;
         campaignTrail_temp.__shuffleExecuted = true;
+        if (campaignTrail_temp.questions_json !== baseQuestions) return;
         
         const qArr = campaignTrail_temp.questions_json;
         if (!Array.isArray(qArr) || qArr.length <= 1) return;
@@ -11739,12 +11740,9 @@ campaignTrail_temp.game_start_logging_id = '3668400';
         console.info("Question shuffle completed.", newOrder);
     }
     
-    window.questionHTML = function(...args) {
-        try { performShuffle(); } catch (err) {
-            console.error("Question shuffle error:", err);
-        }
-        return originalQuestionHTML.apply(this, args);
-    };
+    try { performShuffle(); } catch (err) {
+        console.error("Question shuffle error:", err);
+    }
 })();
 
 shuffleQuestions([9, 13], [15, 19], [21, 23]);
